@@ -21,24 +21,59 @@ for system in ['IMIS', 'AEM', 'Misoteps']:
     ybr_data[system] = df
 
 print("CHARTS", flush=True)
+months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
+
 for system, df in ybr_data.items():
-    for period_type, count in [('yearly', 5), ('quarterly', 4), ('monthly', 12)]:
-        fig, ax = plt.subplots(figsize=(10, 6))
-        data = df.head(count)
-        x = np.arange(len(data))
-        width = 0.35
-        ax.bar(x - width/2, data['Worked'], width, label='Total Worked', color=COLORS['worked'], edgecolor='white', linewidth=1.5)
-        ax.bar(x + width/2, data['Received'], width, label='Total Received', color=COLORS['received'], edgecolor='white', linewidth=1.5)
-        ax.set_xlabel('Period', fontweight='bold')
-        ax.set_ylabel('Count', fontweight='bold')
-        ax.set_title(f'{system} Worked vs Received', fontweight='bold')
-        ax.set_xticks(x)
-        ax.set_xticklabels(data['Period'].astype(str), rotation=45, ha='right')
-        ax.legend()
-        ax.grid(axis='y', alpha=0.3)
-        plt.tight_layout()
-        fig.savefig(f'reports/graphs/{period_type}_{system.lower()}.png', dpi=300, bbox_inches='tight')
-        plt.close(fig)
+    # YEARLY
+    data = df.head(5).copy()
+    fig, ax = plt.subplots(figsize=(10, 6))
+    x = np.arange(len(data))
+    ax.bar(x - 0.175, data['Worked'], 0.35, label='Total Worked', color=COLORS['worked'])
+    ax.bar(x + 0.175, data['Received'], 0.35, label='Total Received', color=COLORS['received'])
+    ax.set_xlabel('Year')
+    ax.set_ylabel('Count')
+    ax.set_title(f'{system} Worked vs Received')
+    ax.set_xticks(x)
+    ax.set_xticklabels(data['Period'].astype(str), rotation=45, ha='right')
+    ax.legend()
+    ax.grid(axis='y', alpha=0.3)
+    plt.tight_layout()
+    fig.savefig(f'reports/graphs/yearly_{system.lower()}.png', dpi=300, bbox_inches='tight')
+    plt.close(fig)
+    
+    # QUARTERLY
+    data = df.head(4).copy()
+    fig, ax = plt.subplots(figsize=(10, 6))
+    x = np.arange(len(data))
+    ax.bar(x - 0.175, data['Worked'], 0.35, label='Total Worked', color=COLORS['worked'])
+    ax.bar(x + 0.175, data['Received'], 0.35, label='Total Received', color=COLORS['received'])
+    ax.set_xlabel('Quarter')
+    ax.set_ylabel('Count')
+    ax.set_title(f'{system} Worked vs Received')
+    ax.set_xticks(x)
+    ax.set_xticklabels([f'Q{i+1}' for i in range(len(data))], rotation=45, ha='right')
+    ax.legend()
+    ax.grid(axis='y', alpha=0.3)
+    plt.tight_layout()
+    fig.savefig(f'reports/graphs/quarterly_{system.lower()}.png', dpi=300, bbox_inches='tight')
+    plt.close(fig)
+    
+    # MONTHLY
+    data = df.head(12).copy()
+    fig, ax = plt.subplots(figsize=(10, 6))
+    x = np.arange(len(data))
+    ax.bar(x - 0.175, data['Worked'], 0.35, label='Total Worked', color=COLORS['worked'])
+    ax.bar(x + 0.175, data['Received'], 0.35, label='Total Received', color=COLORS['received'])
+    ax.set_xlabel('Month')
+    ax.set_ylabel('Count')
+    ax.set_title(f'{system} Worked vs Received')
+    ax.set_xticks(x)
+    ax.set_xticklabels(months[:len(data)], rotation=45, ha='right')
+    ax.legend()
+    ax.grid(axis='y', alpha=0.3)
+    plt.tight_layout()
+    fig.savefig(f'reports/graphs/monthly_{system.lower()}.png', dpi=300, bbox_inches='tight')
+    plt.close(fig)
 
 print("HTML", flush=True)
 html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Toll Reports</title><style>body{font-family:Arial;background:#f0f0f0;padding:20px}.container{max-width:1600px;margin:0 auto;background:white;border-radius:10px;padding:40px}header{text-align:center;border-bottom:4px solid #4B2B72;padding-bottom:20px;margin-bottom:30px}h1{color:#333;font-size:2.5em}.subtitle{color:#00B050;font-weight:bold}.legend{display:flex;justify-content:center;gap:40px;margin:20px 0}.legend-item{display:flex;align-items:center;gap:10px}.legend-color{width:30px;height:30px;border-radius:4px}.worked{background:#00B050}.received{background:#4B2B72}.section-title{color:#4B2B72;font-size:2em;font-weight:bold;margin:30px 0 20px 0;border-bottom:3px solid #00B050;padding-bottom:10px}.system-title{color:#4B2B72;font-size:1.5em;margin:20px 0 10px 0}.wrapper{display:grid;grid-template-columns:1fr 1fr;gap:30px}table{width:100%;border-collapse:collapse}th{background:#4B2B72;color:white;padding:10px}td{padding:8px;border:1px solid #ddd}img{max-width:100%;border-radius:5px}footer{text-align:center;margin-top:50px;border-top:2px solid #4B2B72;padding-top:20px}</style></head><body><div class="container"><header><h1>📊 Toll Reports Dashboard</h1><div class="subtitle">Monthly, Quarterly & Yearly Performance Analysis</div></header><div class="legend"><div class="legend-item"><div class="legend-color worked"></div>Total Worked</div><div class="legend-item"><div class="legend-color received"></div>Total Received</div></div>'
@@ -60,7 +95,6 @@ for system in ['Misoteps', 'IMIS', 'AEM']:
     html += f'</table></div><div><img src="graphs/quarterly_{system.lower()}.png"></div></div>'
 
 html += '</section><section><h2 class="section-title">📅 Monthly Performance</h2>'
-months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 for system in ['Misoteps', 'IMIS', 'AEM']:
     data = ybr_data[system].head(12)
     html += f'<div class="system-title">{system} Monthly</div><div class="wrapper"><div><table><tr><th>Month</th><th>Worked</th><th>Received</th></tr>'
