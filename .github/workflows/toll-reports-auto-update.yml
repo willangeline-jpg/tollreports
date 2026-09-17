@@ -6,7 +6,7 @@ on:
       - '*.xlsx'
   workflow_dispatch:
   schedule:
-    - cron: '0 8 1 * *'  # 1st of month at 8 AM UTC
+    - cron: '0 8 1 * *'
 
 jobs:
   generate-reports:
@@ -31,6 +31,12 @@ jobs:
       - name: Generate reports
         run: python generate_toll_reports.py
       
-      - name: Check if files were created
+      - name: Commit and push
         run: |
-          ls -la reports/ 2>/dev/null || echo "Reports folder not
+          git config user.name "GitHub Actions"
+          git config user.email "actions@github.com"
+          git add -A
+          git commit -m "Auto-generate toll reports" || echo "No changes to commit"
+          git push origin main
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
