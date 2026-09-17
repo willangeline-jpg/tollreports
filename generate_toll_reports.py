@@ -1,8 +1,7 @@
 #!/usr/bin/env python3
 """
-Toll Reports Generator - Monthly, Quarterly & Yearly
-Generates charts and reports with Green & Purple colors
-Worked vs Received comparisons for IMIS, Misoteps, AEM
+Toll Reports Generator with Tables & Charts
+Generates professional reports with tables and charts side by side
 """
 
 import pandas as pd
@@ -11,10 +10,10 @@ import numpy as np
 import os
 from datetime import datetime
 
-# CORRECTED Colors - Green for Worked, Purple for Received
+# Colors - Green for Worked, Purple for Received
 CHART_COLORS = {
-    'worked': '#00B050',         # Bright GREEN for Worked
-    'received': '#4B2B72',       # Dark PURPLE for Received
+    'worked': '#00B050',         # Bright GREEN
+    'received': '#4B2B72',       # Dark PURPLE
     'white': '#FFFFFF',
     'light_gray': '#F5F5F5',
     'dark_gray': '#333333'
@@ -55,7 +54,7 @@ class TollReportsGenerator:
     
     def create_worked_vs_received_chart(self, system_name, data, period_type='yearly'):
         """Create Worked vs Received comparison chart"""
-        fig, ax = plt.subplots(figsize=(14, 8))
+        fig, ax = plt.subplots(figsize=(10, 6))
         
         periods = data['Period'].astype(str).values
         worked = data['Worked'].values
@@ -64,7 +63,7 @@ class TollReportsGenerator:
         x = np.arange(len(periods))
         width = 0.35
         
-        # GREEN for Worked (left bars), PURPLE for Received (right bars)
+        # GREEN for Worked, PURPLE for Received
         bars1 = ax.bar(x - width/2, worked, width, label='Total Worked', 
                        color=CHART_COLORS['worked'], 
                        edgecolor='white', linewidth=1.5, alpha=0.9)
@@ -72,25 +71,25 @@ class TollReportsGenerator:
                        color=CHART_COLORS['received'], 
                        edgecolor='white', linewidth=1.5, alpha=0.9)
         
-        ax.set_xlabel(f'{period_type.capitalize()} Period', fontsize=13, fontweight='bold')
-        ax.set_ylabel('Count', fontsize=13, fontweight='bold')
+        ax.set_xlabel('Period', fontsize=11, fontweight='bold')
+        ax.set_ylabel('Count', fontsize=11, fontweight='bold')
         ax.set_title(f'{system_name} Worked vs Received', 
-                    fontsize=16, fontweight='bold', color=CHART_COLORS['dark_gray'], pad=20)
+                    fontsize=13, fontweight='bold', color=CHART_COLORS['dark_gray'])
         ax.set_xticks(x)
         ax.set_xticklabels(periods, rotation=45, ha='right')
         
-        # Add value labels on bars
+        # Add value labels
         for bar in bars1:
             height = bar.get_height()
             ax.text(bar.get_x() + bar.get_width()/2., height,
-                   f'{int(height):,}', ha='center', va='bottom', fontsize=9, color=CHART_COLORS['dark_gray'])
+                   f'{int(height):,}', ha='center', va='bottom', fontsize=8, color=CHART_COLORS['dark_gray'])
         
         for bar in bars2:
             height = bar.get_height()
             ax.text(bar.get_x() + bar.get_width()/2., height,
-                   f'{int(height):,}', ha='center', va='bottom', fontsize=9, color=CHART_COLORS['dark_gray'])
+                   f'{int(height):,}', ha='center', va='bottom', fontsize=8, color=CHART_COLORS['dark_gray'])
         
-        ax.legend(fontsize=12, loc='upper left', framealpha=0.95)
+        ax.legend(fontsize=10, loc='upper left')
         ax.grid(axis='y', alpha=0.3, linestyle='--')
         ax.set_axisbelow(True)
         fig.patch.set_facecolor(CHART_COLORS['white'])
@@ -99,16 +98,18 @@ class TollReportsGenerator:
         plt.tight_layout()
         return fig
     
-    def create_comparison_chart(self, data_dict, period_type='yearly'):
-        """Create side-by-side comparison of all systems"""
-        fig, axes = plt.subplots(1, 3, figsize=(20, 7))
-        fig.suptitle(f'Toll Reports - Worked vs Received Comparison ({period_type.capitalize()})', 
-                    fontsize=18, fontweight='bold', color=CHART_COLORS['dark_gray'], y=1.02)
-        
-        systems = ['IMIS', 'AEM', 'Misoteps']
-        
-        for idx, (ax, system) in enumerate(zip(axes, systems)):
-            if system in data_dict:
-                data = data_dict[system]
-                
-                periods = data['Period'].astype(str).values
+    def extract_yearly_data(self, ybr_data):
+        """Extract yearly summary data"""
+        yearly_data = {}
+        for system, df in ybr_data.items():
+            yearly_data[system] = df.head(5)
+        return yearly_data
+    
+    def extract_quarterly_data(self, ybr_data):
+        """Extract quarterly data"""
+        quarterly_data = {}
+        for system, df in ybr_data.items():
+            quarterly_data[system] = df.head(4)
+        return quarterly_data
+    
+    def extract_monthly_data(self, ybr_data):
