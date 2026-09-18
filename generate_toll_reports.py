@@ -24,17 +24,18 @@ print("CHARTS", flush=True)
 months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 for system, df in ybr_data.items():
-    # YEARLY - Remove duplicates by Year
-    data = df.drop_duplicates(subset=['Year']).head(5).copy()
+    # YEARLY - Get unique years only, sorted ascending (2022, 2023, 2024, 2025)
+    yearly_data = df.drop_duplicates(subset=['Year'], keep='first').sort_values('Year', ascending=True).head(5)
+    
     fig, ax = plt.subplots(figsize=(10, 6))
-    x = np.arange(len(data))
-    ax.bar(x - 0.175, data['Worked'], 0.35, label='Total Worked', color=COLORS['worked'])
-    ax.bar(x + 0.175, data['Received'], 0.35, label='Total Received', color=COLORS['received'])
+    x = np.arange(len(yearly_data))
+    ax.bar(x - 0.175, yearly_data['Worked'], 0.35, label='Total Worked', color=COLORS['worked'])
+    ax.bar(x + 0.175, yearly_data['Received'], 0.35, label='Total Received', color=COLORS['received'])
     ax.set_xlabel('Year')
     ax.set_ylabel('Count')
     ax.set_title(f'{system} Worked vs Received')
     ax.set_xticks(x)
-    ax.set_xticklabels([str(v) for v in data['Year'].values], rotation=45, ha='right')
+    ax.set_xticklabels([str(v) for v in yearly_data['Year'].values], rotation=45, ha='right')
     ax.legend()
     ax.grid(axis='y', alpha=0.3)
     plt.tight_layout()
@@ -80,9 +81,9 @@ html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Toll Reports</ti
 
 html += '<section><h2 class="section-title">📈 Yearly Performance</h2>'
 for system in ['Misoteps', 'IMIS', 'AEM']:
-    data = ybr_data[system].drop_duplicates(subset=['Year']).head(5)
+    yearly_data = ybr_data[system].drop_duplicates(subset=['Year'], keep='first').sort_values('Year', ascending=True).head(5)
     html += f'<div class="system-title">{system} Yearly</div><div class="wrapper"><div><table><tr><th>Year</th><th>Worked</th><th>Received</th></tr>'
-    for _, row in data.iterrows():
+    for _, row in yearly_data.iterrows():
         html += f'<tr><td>{str(row["Year"])}</td><td>{int(row["Worked"]):,}</td><td>{int(row["Received"]):,}</td></tr>'
     html += f'</table></div><div><img src="graphs/yearly_{system.lower()}.png"></div></div>'
 
