@@ -34,7 +34,7 @@ for system, df in ybr_data.items():
     ax.set_ylabel('Count')
     ax.set_title(f'{system} Worked vs Received')
     ax.set_xticks(x)
-    ax.set_xticklabels(data['Period'].astype(str), rotation=45, ha='right')
+    ax.set_xticklabels(data['Year'].astype(int).astype(str), rotation=45, ha='right')
     ax.legend()
     ax.grid(axis='y', alpha=0.3)
     plt.tight_layout()
@@ -81,9 +81,9 @@ html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Toll Reports</ti
 html += '<section><h2 class="section-title">📈 Yearly Performance</h2>'
 for system in ['Misoteps', 'IMIS', 'AEM']:
     data = ybr_data[system].head(5)
-    html += f'<div class="system-title">{system} Yearly</div><div class="wrapper"><div><table><tr><th>Period</th><th>Worked</th><th>Received</th></tr>'
+    html += f'<div class="system-title">{system} Yearly</div><div class="wrapper"><div><table><tr><th>Year</th><th>Worked</th><th>Received</th></tr>'
     for _, row in data.iterrows():
-        html += f'<tr><td>{row["Period"]}</td><td>{int(row["Worked"]):,}</td><td>{int(row["Received"]):,}</td></tr>'
+        html += f'<tr><td>{int(row["Year"])}</td><td>{int(row["Worked"]):,}</td><td>{int(row["Received"]):,}</td></tr>'
     html += f'</table></div><div><img src="graphs/yearly_{system.lower()}.png"></div></div>'
 
 html += '</section><section><h2 class="section-title">📊 Quarterly Performance</h2>'
