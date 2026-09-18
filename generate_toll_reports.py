@@ -24,8 +24,8 @@ print("CHARTS", flush=True)
 months = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec']
 
 for system, df in ybr_data.items():
-    # YEARLY
-    data = df.head(5).copy()
+    # YEARLY - Remove duplicates by Year
+    data = df.drop_duplicates(subset=['Year']).head(5).copy()
     fig, ax = plt.subplots(figsize=(10, 6))
     x = np.arange(len(data))
     ax.bar(x - 0.175, data['Worked'], 0.35, label='Total Worked', color=COLORS['worked'])
@@ -80,7 +80,7 @@ html = '<!DOCTYPE html><html><head><meta charset="UTF-8"><title>Toll Reports</ti
 
 html += '<section><h2 class="section-title">📈 Yearly Performance</h2>'
 for system in ['Misoteps', 'IMIS', 'AEM']:
-    data = ybr_data[system].head(5)
+    data = ybr_data[system].drop_duplicates(subset=['Year']).head(5)
     html += f'<div class="system-title">{system} Yearly</div><div class="wrapper"><div><table><tr><th>Year</th><th>Worked</th><th>Received</th></tr>'
     for _, row in data.iterrows():
         html += f'<tr><td>{int(row["Year"])}</td><td>{int(row["Worked"]):,}</td><td>{int(row["Received"]):,}</td></tr>'
