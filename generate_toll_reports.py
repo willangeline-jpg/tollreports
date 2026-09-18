@@ -18,6 +18,8 @@ for system in ['IMIS', 'AEM', 'Misoteps']:
     df = pd.read_excel('YBR.xlsx', sheet_name=system, skiprows=1)
     df.columns = ['Period', 'Year', 'Worked', 'Received']
     df = df.dropna(subset=['Year', 'Worked', 'Received'])
+    df['Year'] = pd.to_numeric(df['Year'], errors='coerce')
+    df = df.dropna(subset=['Year'])
     ybr_data[system] = df
 
 print("CHARTS", flush=True)
@@ -35,7 +37,7 @@ for system, df in ybr_data.items():
     ax.set_ylabel('Count')
     ax.set_title(f'{system} Worked vs Received')
     ax.set_xticks(x)
-    ax.set_xticklabels([str(v) for v in yearly_data['Year'].values], rotation=45, ha='right')
+    ax.set_xticklabels([str(int(v)) for v in yearly_data['Year'].values], rotation=45, ha='right')
     ax.legend()
     ax.grid(axis='y', alpha=0.3)
     plt.tight_layout()
@@ -84,7 +86,7 @@ for system in ['Misoteps', 'IMIS', 'AEM']:
     yearly_data = ybr_data[system].drop_duplicates(subset=['Year'], keep='first').sort_values('Year', ascending=True).head(5)
     html += f'<div class="system-title">{system} Yearly</div><div class="wrapper"><div><table><tr><th>Year</th><th>Worked</th><th>Received</th></tr>'
     for _, row in yearly_data.iterrows():
-        html += f'<tr><td>{str(row["Year"])}</td><td>{int(row["Worked"]):,}</td><td>{int(row["Received"]):,}</td></tr>'
+        html += f'<tr><td>{int(row["Year"])}</td><td>{int(row["Worked"]):,}</td><td>{int(row["Received"]):,}</td></tr>'
     html += f'</table></div><div><img src="graphs/yearly_{system.lower()}.png"></div></div>'
 
 html += '</section><section><h2 class="section-title">📊 Quarterly Performance</h2>'
